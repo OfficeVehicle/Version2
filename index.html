@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LGU Iloilo City Vehicle Scheduling System</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #0f766e;
+      --primary-dark: #115e59;
+      --danger: #dc2626;
+      --warning: #d97706;
+      --low: #6b7280;
+      --success: #16a34a;
+      --border: #dbe2ea;
+      --shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef5fb 0%, #f9fbfd 100%);
+      color: var(--text);
+    }
+
+    .app-shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #0f766e, #155e75);
+      color: #fff;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 32px;
+    }
+
+    .hero p {
+      margin: 0;
+      opacity: 0.95;
+      line-height: 1.5;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.88;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 18px;
+    }
+
+    .sidebar,
+    .panel,
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .sidebar {
+      padding: 16px;
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .nav-title {
+      font-size: 13px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      border: 0;
+      background: #f3f6fa;
+      color: var(--text);
+      padding: 12px 14px;
+      text-align: left;
+      border-radius: 14px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .nav-btn.active,
+    .nav-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .section-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      padding: 18px;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 18px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+
+    textarea { resize: vertical; min-height: 88px; }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: #e2e8f0; color: #0f172a; }
+    .btn-danger { background: #fee2e2; color: #991b1b; }
+    .btn-success { background: #dcfce7; color: #166534; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .priority-high { background: #fee2e2; color: #991b1b; }
+    .priority-medium { background: #fef3c7; color: #92400e; }
+    .priority-low { background: #e5e7eb; color: #374151; }
+    .status-pending { background: #e0f2fe; color: #075985; }
+    .status-approved { background: #dcfce7; color: #166534; }
+    .status-ongoing { background: #fef3c7; color: #92400e; }
+    .status-completed { background: #ede9fe; color: #5b21b6; }
+    .status-rejected { background: #fee2e2; color: #991b1b; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      position: sticky;
+      top: 0;
+    }
+
+    tr:hover td { background: #f8fbff; }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+
+    .alert {
+      border-radius: 14px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      border: 1px solid transparent;
+      display: none;
+    }
+
+    .alert.show { display: block; }
+    .alert-info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+    .alert-danger { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .alert-success { background: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+
+    .mini-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+
+    .mini-item strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .muted { color: var(--muted); }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 24px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #fcfdff;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      background: currentColor;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1100px) {
+      .layout,
+      .hero-grid,
+      .split,
+      .card-grid,
+      .form-grid,
+      .form-grid-3,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1>Vehicle Scheduling System</h1>
+          <p>LGU - Iloilo City Ready | Flow: Request → Approval → Scheduling → Dispatch → Monitoring → Reporting</p>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-label">Pending Requests</div>
+              <div class="stat-value" id="statPending">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Approved Trips</div>
+              <div class="stat-value" id="statApproved">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Ongoing Trips</div>
+              <div class="stat-value" id="statOngoing">0</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Completed Trips</div>
+              <div class="stat-value" id="statCompleted">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.18); color: #fff;">
+          <h3 style="margin-top:0;">Control Rules</h3>
+          <div class="mini-list">
+            <div>✅ No approved schedule = no vehicle release</div>
+            <div>✅ Emergency trips can override lower priority</div>
+            <div>✅ Avoid overlapping schedules per vehicle</div>
+            <div>✅ Fuel release tied to approved schedule only</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="nav-title">System Menu</div>
+        <button class="nav-btn active" data-tab="requests">Request Form</button>
+        <button class="nav-btn" data-tab="schedule">Scheduling Board</button>
+        <button class="nav-btn" data-tab="dispatch">Dispatch Logbook</button>
+        <button class="nav-btn" data-tab="reports">Reports</button>
+        <button class="nav-btn" data-tab="settings">Vehicles & Drivers</button>
+      </aside>
+
+      <main class="panel">
+        <section id="requests" class="tab-pane active">
+          <div class="section-header">
+            <div>
+              <h2>Vehicle Request Form</h2>
+              <p>All trips must be requested and approved before scheduling.</p>
+            </div>
+            <div class="inline-actions">
+              <button class="btn btn-secondary" id="seedBtn">Load Sample Data</button>
+              <button class="btn btn-danger" id="resetBtn">Clear All Data</button>
+            </div>
+          </div>
+
+          <div id="requestAlert" class="alert alert-info"></div>
+
+          <div class="split">
+            <div class="card">
+              <h3>Create New Request</h3>
+              <form id="requestForm">
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Office / Department</label>
+                    <input type="text" id="office" required />
+                  </div>
+                  <div class="field">
+                    <label>Requesting Officer</label>
+                    <input type="text" id="requestingOfficer" required />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Purpose of Trip</label>
+                  <textarea id="purpose" required></textarea>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="field">
+                    <label>Priority Level</label>
+                    <select id="priority" required>
+                      <option value="HIGH">🔴 Emergency</option>
+                      <option value="MEDIUM">🟡 Essential</option>
+                      <option value="LOW">⚪ Routine</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>Date Needed</label>
+                    <input type="date" id="dateNeeded" required />
+                  </div>
+                  <div class="field">
+                    <label>Estimated Duration (hours)</label>
+                    <input type="number" min="1" step="1" id="duration" required />
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Time Needed</label>
+                    <input type="time" id="timeNeeded" required />
+                  </div>
+                  <div class="field">
+                    <label>Destination / s</label>
+                    <input type="text" id="destination" required />
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="field">
+                    <label>No. of Passengers</label>
+                    <input type="number" min="1" id="passengers" required />
+                  </div>
+                  <div class="field">
+                    <label>Passenger Names</label>
+                    <input type="text" id="passengerNames" placeholder="Optional" />
+                  </div>
+                  <div class="field">
+                    <label>Vehicle Type Needed</label>
+                    <select id="vehicleType" required>
+                      <option value="Sedan">Sedan</option>
+                      <option value="Pickup">Pickup</option>
+                      <option value="Van">Van</option>
+                      <option value="Truck">Truck</option>
+                      <option value="Ambulance">Ambulance</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Special Needs</label>
+                    <input type="text" id="specialNeeds" placeholder="Optional" />
+                  </div>
+                  <div class="field">
+                    <label>Department Head Approval</label>
+                    <select id="deptApproval" required>
+                      <option value="Approved">✅ Approved</option>
+                      <option value="Rejected">❌ Rejected</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label>Officer Dispatcher Approval</label>
+                  <select id="dispatcherApproval" required>
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">✅ Approved</option>
+                    <option value="Rejected">❌ Rejected</option>
+                  </select>
+                </div>
+
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Save Request</button>
+                  <button type="button" class="btn btn-secondary" id="requestFormReset">Reset Form</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>Pending / Recent Requests</h3>
+              <div id="requestList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="schedule" class="tab-pane">
+          <div class="section-header">
+            <div>
+              <h2>Daily Vehicle Scheduling Table</h2>
+              <p>Centralized under GSO Dispatcher Unit. Approved requests only.</p>
+            </div>
+          </div>
+
+          <div id="scheduleAlert" class="alert alert-info"></div>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Create Schedule</h3>
+              <form id="scheduleForm">
+                <div class="field">
+                  <label>Approved Request</label>
+                  <select id="scheduleRequestId" required></select>
+                </div>
+                <div class="form-grid-3">
+                  <div class="field">
+                    <label>Vehicle</label>
+                    <select id="scheduleVehicleId" required></select>
+                  </div>
+                  <div class="field">
+                    <label>Driver Name</label>
+                    <input type="text" id="scheduleDriver" required placeholder="Enter driver name" />
+                  </div>
+                  <div class="field">
+                    <label>Status</label>
+                    <select id="scheduleStatus" required>
+                      <option value="Approved">Approved</option>
+                      <option value="Ongoing">Ongoing</option>
+                      <option value="Completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Add to Schedule</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>Scheduling Rules</h3>
+              <div class="mini-list">
+                <div class="mini-item"><strong>No overlapping schedules</strong><span class="muted">Same vehicle cannot be booked at overlapping times on the same date.</span></div>
+                <div class="mini-item"><strong>Priority override</strong><span class="muted">Emergency requests may replace lower-priority trips when resources are limited.</span></div>
+                <div class="mini-item"><strong>Trip consolidation</strong><span class="muted">Requests with the same destination can be combined to save fuel.</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-header">
+              <div>
+                <h2 style="font-size: 20px;">Live Schedule Board</h2>
+                <p>Approved, ongoing, and completed trips.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Time</th>
+                    <th>Vehicle</th>
+                    <th>Plate No.</th>
+                    <th>Driver</th>
+                    <th>Requesting Office</th>
+                    <th>Destination</th>
+                    <th>Purpose</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="scheduleTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section id="dispatch" class="tab-pane">
+          <div class="section-header">
+            <div>
+              <h2>Dispatch Logbook</h2>
+              <p>Each trip must record time, odometer, fuel, route, and remarks.</p>
+            </div>
+          </div>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Trip Monitoring Entry</h3>
+              <form id="dispatchForm">
+                <div class="field">
+                  <label>Scheduled Trip</label>
+                  <select id="dispatchScheduleId" required></select>
+                </div>
+                <div class="form-grid-3">
+                  <div class="field">
+                    <label>Time Out</label>
+                    <input type="time" id="timeOut" required />
+                  </div>
+                  <div class="field">
+                    <label>Time In</label>
+                    <input type="time" id="timeIn" required />
+                  </div>
+                  <div class="field">
+                    <label>Fuel Issued (L)</label>
+                    <input type="number" min="0" step="0.1" id="fuelIssued" required />
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Odometer Start</label>
+                    <input type="number" min="0" id="odometerStart" required />
+                  </div>
+                  <div class="field">
+                    <label>Odometer End</label>
+                    <input type="number" min="0" id="odometerEnd" required />
+                  </div>
+                </div>
+                <div class="field">
+                  <label>Route Taken</label>
+                  <input type="text" id="routeTaken" required />
+                </div>
+                <div class="field">
+                  <label>Remarks</label>
+                  <textarea id="dispatchRemarks"></textarea>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Save Dispatch Log</button>
+                </div>
+              </form>
+            </div>
+
+            <div class="card">
+              <h3>Dispatch Entries</h3>
+              <div id="dispatchList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="reports" class="tab-pane">
+          <div class="section-header">
+            <div>
+              <h2>Weekly Reporting Output</h2>
+              <p>Total trips, fuel consumption, most used vehicles, and idle vehicles.</p>
+            </div>
+            <button class="btn btn-secondary" id="printReportBtn">Print Report</button>
+          </div>
+
+          <div class="card-grid">
+            <div class="card"><h3>Total Trips</h3><div class="stat-value" style="color: var(--primary);" id="reportTrips">0</div></div>
+            <div class="card"><h3>Fuel Consumption (L)</h3><div class="stat-value" style="color: var(--warning);" id="reportFuel">0</div></div>
+            <div class="card"><h3>Most Used Vehicle</h3><div class="stat-value" style="font-size: 20px;" id="reportMostUsed">-</div></div>
+            <div class="card"><h3>Idle Vehicles</h3><div class="stat-value" style="font-size: 20px;" id="reportIdle">-</div></div>
+          </div>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Priority Summary</h3>
+              <div id="prioritySummary" class="mini-list"></div>
+            </div>
+            <div class="card">
+              <h3>Vehicle Utilization</h3>
+              <div id="vehicleSummary" class="mini-list"></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="settings" class="tab-pane">
+          <div class="section-header">
+            <div>
+              <h2>Vehicles and Drivers</h2>
+              <p>Maintain fleet and driver records for scheduling.</p>
+            </div>
+          </div>
+
+          <div class="card-grid">
+            <div class="card">
+              <h3>Add Vehicle</h3>
+              <form id="vehicleForm">
+                <div class="form-grid-3">
+                  <div class="field">
+                    <label>Vehicle Name</label>
+                    <input type="text" id="vehicleName" required />
+                  </div>
+                  <div class="field">
+                    <label>Plate No.</label>
+                    <input type="text" id="vehiclePlate" required />
+                  </div>
+                  <div class="field">
+                    <label>Type</label>
+                    <select id="vehicleCategory" required>
+                      <option>Sedan</option>
+                      <option>Pickup</option>
+                      <option>Van</option>
+                      <option>Truck</option>
+                      <option>Ambulance</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Save Vehicle</button>
+                </div>
+              </form>
+              <div id="vehicleList" style="margin-top: 16px;"></div>
+            </div>
+
+            <div class="card">
+              <h3>Add Driver</h3>
+              <form id="driverForm">
+                <div class="field">
+                  <label>Driver Name</label>
+                  <input type="text" id="driverName" required />
+                </div>
+                <div class="actions">
+                  <button type="submit" class="btn btn-primary">Save Driver</button>
+                </div>
+              </form>
+              <div id="driverList" style="margin-top: 16px;"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="footer-note">Vehicle Scheduling System for LGU – Iloilo City • Browser-based HTML, CSS, and JavaScript</div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'iloilo_vehicle_scheduling_system_v1';
+
+    const state = {
+      requests: [],
+      schedules: [],
+      dispatchLogs: [],
+      vehicles: [],
+      drivers: []
+    };
+
+    function uid(prefix) {
+      return prefix + '_' + Math.random().toString(36).slice(2, 10);
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadState() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const parsed = JSON.parse(raw);
+        state.requests = parsed.requests || [];
+        state.schedules = parsed.schedules || [];
+        state.dispatchLogs = parsed.dispatchLogs || [];
+        state.vehicles = parsed.vehicles || [];
+        state.drivers = parsed.drivers || [];
+      } catch (err) {
+        console.error('Failed to load saved data', err);
+      }
+    }
+
+    function showAlert(id, message, type = 'info') {
+      const el = document.getElementById(id);
+      el.className = `alert show alert-${type}`;
+      el.textContent = message;
+      setTimeout(() => {
+        el.className = 'alert alert-info';
+        el.textContent = '';
+      }, 3500);
+    }
+
+    function priorityLabel(priority) {
+      if (priority === 'HIGH') return '<span class="pill priority-high">🔴 Emergency</span>';
+      if (priority === 'MEDIUM') return '<span class="pill priority-medium">🟡 Essential</span>';
+      return '<span class="pill priority-low">⚪ Routine</span>';
+    }
+
+    function statusLabel(status) {
+      const normalized = status.toLowerCase();
+      return `<span class="pill status-${normalized}">${status}</span>`;
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-PH', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+    }
+
+    function calculateEndTime(startTime, durationHours) {
+      const [h, m] = startTime.split(':').map(Number);
+      const totalMinutes = h * 60 + m + (Number(durationHours) * 60);
+      const endHour = Math.floor((totalMinutes % (24 * 60)) / 60);
+      const endMin = totalMinutes % 60;
+      return `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    }
+
+    function timeToMinutes(value) {
+      const [h, m] = value.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function overlaps(aStart, aEnd, bStart, bEnd) {
+      return Math.max(timeToMinutes(aStart), timeToMinutes(bStart)) < Math.min(timeToMinutes(aEnd), timeToMinutes(bEnd));
+    }
+
+    function getRequestById(id) {
+      return state.requests.find(r => r.id === id);
+    }
+
+    function getVehicleById(id) {
+      return state.vehicles.find(v => v.id === id);
+    }
+
+    function getDispatchByScheduleId(scheduleId) {
+      return state.dispatchLogs.find(d => d.scheduleId === scheduleId);
+    }
+
+    function seedDefaults() {
+      if (!state.vehicles.length) {
+        state.vehicles = [
+          { id: uid('veh'), name: 'Pickup', plateNo: 'ILO-201', type: 'Pickup' },
+          { id: uid('veh'), name: 'Van', plateNo: 'ILO-202', type: 'Van' },
+          { id: uid('veh'), name: 'Truck', plateNo: 'DEF-789', type: 'Truck' },
+          { id: uid('veh'), name: 'Ambulance', plateNo: 'ILO-203', type: 'Ambulance' }
+        ];
+      }
+      if (!state.drivers.length) {
+        state.drivers = ['Dela Cruz', 'Santos', 'Reyes', 'Garcia'];
+      }
+    }
+
+    function seedSampleData() {
+      seedDefaults();
+      if (state.requests.length || state.schedules.length) {
+        showAlert('requestAlert', 'Sample data was skipped because existing data is already present.', 'info');
+        renderAll();
+        return;
+      }
+
+      const req1 = {
+        id: uid('req'),
+        office: 'CENRO',
+        requestingOfficer: 'Maria Lopez',
+        purpose: 'Waste Inspection',
+        priority: 'MEDIUM',
+        dateNeeded: new Date().toISOString().slice(0, 10),
+        timeNeeded: '08:00',
+        duration: 2,
+        destination: 'Brgy. Tanza',
+        passengers: 3,
+        passengerNames: 'Team A',
+        vehicleType: 'Pickup',
+        specialNeeds: '',
+        deptApproval: 'Approved',
+        dispatcherApproval: 'Approved',
+        status: 'Approved',
+        createdAt: new Date().toISOString()
+      };
+
+      const req2 = {
+        id: uid('req'),
+        office: 'CHO',
+        requestingOfficer: 'Ana Santos',
+        purpose: 'Medical Outreach',
+        priority: 'HIGH',
+        dateNeeded: new Date().toISOString().slice(0, 10),
+        timeNeeded: '09:00',
+        duration: 3,
+        destination: 'District Clinic',
+        passengers: 5,
+        passengerNames: 'Nurses',
+        vehicleType: 'Van',
+        specialNeeds: 'Medical kits',
+        deptApproval: 'Approved',
+        dispatcherApproval: 'Approved',
+        status: 'Approved',
+        createdAt: new Date().toISOString()
+      };
+
+      const req3 = {
+        id: uid('req'),
+        office: 'GSO',
+        requestingOfficer: 'Pedro Reyes',
+        purpose: 'Hauling',
+        priority: 'MEDIUM',
+        dateNeeded: new Date().toISOString().slice(0, 10),
+        timeNeeded: '10:00',
+        duration: 4,
+        destination: 'Dump Site',
+        passengers: 2,
+        passengerNames: 'Hauling Team',
+        vehicleType: 'Truck',
+        specialNeeds: '',
+        deptApproval: 'Approved',
+        dispatcherApproval: 'Approved',
+        status: 'Approved',
+        createdAt: new Date().toISOString()
+      };
+
+      state.requests.push(req1, req2, req3);
+
+      const schedule1 = {
+        id: uid('sch'),
+        requestId: req1.id,
+        vehicleId: state.vehicles.find(v => v.type === 'Pickup').id,
+        driver: 'Dela Cruz',
+        status: 'Approved',
+        createdAt: new Date().toISOString()
+      };
+      const schedule2 = {
+        id: uid('sch'),
+        requestId: req2.id,
+        vehicleId: state.vehicles.find(v => v.type === 'Van').id,
+        driver: 'Santos',
+        status: 'Approved',
+        createdAt: new Date().toISOString()
+      };
+      const schedule3 = {
+        id: uid('sch'),
+        requestId: req3.id,
+        vehicleId: state.vehicles.find(v => v.type === 'Truck').id,
+        driver: 'Reyes',
+        status: 'Ongoing',
+        createdAt: new Date().toISOString()
+      };
+      state.schedules.push(schedule1, schedule2, schedule3);
+      saveState();
+      renderAll();
+      showAlert('requestAlert', 'Sample data loaded successfully.', 'success');
+    }
+
+    function addRequest(evt) {
+      evt.preventDefault();
+      const deptApproval = document.getElementById('deptApproval').value;
+      const dispatcherApproval = document.getElementById('dispatcherApproval').value;
+
+      let status = 'Pending';
+      if (deptApproval === 'Rejected' || dispatcherApproval === 'Rejected') status = 'Rejected';
+      else if (deptApproval === 'Approved' && dispatcherApproval === 'Approved') status = 'Approved';
+
+      const request = {
+        id: uid('req'),
+        office: document.getElementById('office').value.trim(),
+        requestingOfficer: document.getElementById('requestingOfficer').value.trim(),
+        purpose: document.getElementById('purpose').value.trim(),
+        priority: document.getElementById('priority').value,
+        dateNeeded: document.getElementById('dateNeeded').value,
+        timeNeeded: document.getElementById('timeNeeded').value,
+        duration: Number(document.getElementById('duration').value),
+        destination: document.getElementById('destination').value.trim(),
+        passengers: Number(document.getElementById('passengers').value),
+        passengerNames: document.getElementById('passengerNames').value.trim(),
+        vehicleType: document.getElementById('vehicleType').value,
+        specialNeeds: document.getElementById('specialNeeds').value.trim(),
+        deptApproval,
+        dispatcherApproval,
+        status,
+        createdAt: new Date().toISOString()
+      };
+
+      state.requests.unshift(request);
+      saveState();
+      evt.target.reset();
+      renderAll();
+      showAlert('requestAlert', 'Vehicle request saved successfully.', 'success');
+    }
+
+    function addSchedule(evt) {
+      evt.preventDefault();
+      const requestId = document.getElementById('scheduleRequestId').value;
+      const vehicleId = document.getElementById('scheduleVehicleId').value;
+      const driver = document.getElementById('scheduleDriver').value;
+      const status = document.getElementById('scheduleStatus').value;
+
+      const request = getRequestById(requestId);
+      const vehicle = getVehicleById(vehicleId);
+
+      if (!request || request.status !== 'Approved') {
+        showAlert('scheduleAlert', 'Only approved requests can be scheduled.', 'danger');
+        return;
+      }
+
+      const start = request.timeNeeded;
+      const end = calculateEndTime(request.timeNeeded, request.duration);
+
+      const conflict = state.schedules.find(s => {
+        const req = getRequestById(s.requestId);
+        if (!req || req.dateNeeded !== request.dateNeeded || s.vehicleId !== vehicleId || s.id === requestId) return false;
+        const reqEnd = calculateEndTime(req.timeNeeded, req.duration);
+        return overlaps(start, end, req.timeNeeded, reqEnd);
+      });
+
+      if (conflict) {
+        const conflictReq = getRequestById(conflict.requestId);
+        if (request.priority === 'HIGH' && conflictReq.priority !== 'HIGH') {
+          showAlert('scheduleAlert', 'Conflict found. Emergency trip may override lower-priority booking. Review the existing schedule before dispatch.', 'info');
+        } else {
+          showAlert('scheduleAlert', 'Scheduling conflict detected: this vehicle is already booked in the selected time range.', 'danger');
+          return;
+        }
+      }
+
+      const alreadyScheduled = state.schedules.some(s => s.requestId === requestId);
+      if (alreadyScheduled) {
+        showAlert('scheduleAlert', 'This request is already scheduled.', 'danger');
+        return;
+      }
+
+      state.schedules.unshift({
+        id: uid('sch'),
+        requestId,
+        vehicleId,
+        driver,
+        status,
+        createdAt: new Date().toISOString()
+      });
+      saveState();
+      renderAll();
+      evt.target.reset();
+      showAlert('scheduleAlert', 'Trip added to schedule board.', 'success');
+    }
+
+    function addDispatchLog(evt) {
+      evt.preventDefault();
+      const scheduleId = document.getElementById('dispatchScheduleId').value;
+      const existing = getDispatchByScheduleId(scheduleId);
+      if (existing) {
+        alert('A dispatch log already exists for this schedule.');
+        return;
+      }
+
+      const odometerStart = Number(document.getElementById('odometerStart').value);
+      const odometerEnd = Number(document.getElementById('odometerEnd').value);
+      if (odometerEnd < odometerStart) {
+        alert('Odometer End cannot be lower than Odometer Start.');
+        return;
+      }
+
+      state.dispatchLogs.unshift({
+        id: uid('log'),
+        scheduleId,
+        timeOut: document.getElementById('timeOut').value,
+        timeIn: document.getElementById('timeIn').value,
+        fuelIssued: Number(document.getElementById('fuelIssued').value),
+        odometerStart,
+        odometerEnd,
+        routeTaken: document.getElementById('routeTaken').value.trim(),
+        remarks: document.getElementById('dispatchRemarks').value.trim(),
+        createdAt: new Date().toISOString()
+      });
+
+      const schedule = state.schedules.find(s => s.id === scheduleId);
+      if (schedule) schedule.status = 'Completed';
+
+      saveState();
+      renderAll();
+      evt.target.reset();
+      alert('Dispatch log saved successfully.');
+    }
+
+    function addVehicle(evt) {
+      evt.preventDefault();
+      const plateNo = document.getElementById('vehiclePlate').value.trim().toUpperCase();
+      const exists = state.vehicles.some(v => v.plateNo.toUpperCase() === plateNo);
+      if (exists) {
+        alert('Plate number already exists.');
+        return;
+      }
+      state.vehicles.push({
+        id: uid('veh'),
+        name: document.getElementById('vehicleName').value.trim(),
+        plateNo,
+        type: document.getElementById('vehicleCategory').value
+      });
+      saveState();
+      renderAll();
+      evt.target.reset();
+    }
+
+    function addDriver(evt) {
+      evt.preventDefault();
+      const driver = document.getElementById('driverName').value.trim();
+      if (!driver) return;
+      if (state.drivers.includes(driver)) {
+        alert('Driver already exists.');
+        return;
+      }
+      state.drivers.push(driver);
+      saveState();
+      renderAll();
+      evt.target.reset();
+    }
+
+    function deleteRequest(id) {
+      const linkedSchedule = state.schedules.some(s => s.requestId === id);
+      if (linkedSchedule) {
+        alert('Cannot delete a request that is already scheduled.');
+        return;
+      }
+      state.requests = state.requests.filter(r => r.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    function deleteSchedule(id) {
+      state.dispatchLogs = state.dispatchLogs.filter(d => d.scheduleId !== id);
+      state.schedules = state.schedules.filter(s => s.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    function deleteVehicle(id) {
+      const isUsed = state.schedules.some(s => s.vehicleId === id);
+      if (isUsed) {
+        alert('Cannot delete a vehicle that is already used in a schedule.');
+        return;
+      }
+      state.vehicles = state.vehicles.filter(v => v.id !== id);
+      saveState();
+      renderAll();
+    }
+
+    function deleteDriver(name) {
+      const isUsed = state.schedules.some(s => s.driver === name);
+      if (isUsed) {
+        alert('Cannot delete a driver that is already used in a schedule.');
+        return;
+      }
+      state.drivers = state.drivers.filter(d => d !== name);
+      saveState();
+      renderAll();
+    }
+
+    function setScheduleStatus(id, status) {
+      const schedule = state.schedules.find(s => s.id === id);
+      if (!schedule) return;
+      schedule.status = status;
+      saveState();
+      renderAll();
+    }
+
+    function renderRequests() {
+      const container = document.getElementById('requestList');
+      const sorted = [...state.requests].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      if (!sorted.length) {
+        container.innerHTML = '<div class="empty-state">No requests yet.</div>';
+        return;
+      }
+
+      container.innerHTML = sorted.slice(0, 8).map(r => `
+        <div class="mini-item">
+          <strong>${r.office} - ${r.purpose}</strong>
+          <div>${priorityLabel(r.priority)} ${statusLabel(r.status)}</div>
+          <div class="muted" style="margin-top: 6px;">${formatDate(r.dateNeeded)} • ${r.timeNeeded} • ${r.destination}</div>
+          <div class="muted">Officer: ${r.requestingOfficer} • Vehicle: ${r.vehicleType}</div>
+          <div class="inline-actions" style="margin-top: 10px;">
+            <button class="btn btn-danger" onclick="deleteRequest('${r.id}')">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderScheduleOptions() {
+      const requestSelect = document.getElementById('scheduleRequestId');
+      const vehicleSelect = document.getElementById('scheduleVehicleId');
+      const dispatchSelect = document.getElementById('dispatchScheduleId');
+
+      const approvedUnscheduledRequests = state.requests.filter(r => r.status === 'Approved' && !state.schedules.some(s => s.requestId === r.id));
+      requestSelect.innerHTML = approvedUnscheduledRequests.length
+        ? approvedUnscheduledRequests.map(r => `<option value="${r.id}">${r.office} | ${formatDate(r.dateNeeded)} ${r.timeNeeded} | ${r.destination} | ${r.vehicleType}</option>`).join('')
+        : '<option value="">No approved unscheduled requests</option>';
+
+      vehicleSelect.innerHTML = state.vehicles.length
+        ? state.vehicles.map(v => `<option value="${v.id}">${v.name} - ${v.plateNo} (${v.type})</option>`).join('')
+        : '<option value="">No vehicles available</option>';
+
+      const loggableSchedules = state.schedules.filter(s => !state.dispatchLogs.some(d => d.scheduleId === s.id));
+      dispatchSelect.innerHTML = loggableSchedules.length
+        ? loggableSchedules.map(s => {
+            const req = getRequestById(s.requestId);
+            const veh = getVehicleById(s.vehicleId);
+            return `<option value="${s.id}">${req.office} | ${req.destination} | ${veh ? veh.plateNo : '-'} | ${req.dateNeeded}</option>`;
+          }).join('')
+        : '<option value="">No schedules available</option>';
+    }
+
+    function renderScheduleTable() {
+      const tbody = document.getElementById('scheduleTableBody');
+      const sorted = [...state.schedules].sort((a, b) => new Date(getRequestById(a.requestId)?.dateNeeded || 0) - new Date(getRequestById(b.requestId)?.dateNeeded || 0));
+      if (!sorted.length) {
+        tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state">No schedules yet.</div></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = sorted.map(s => {
+        const req = getRequestById(s.requestId);
+        const veh = getVehicleById(s.vehicleId);
+        if (!req) return '';
+        const end = calculateEndTime(req.timeNeeded, req.duration);
+        return `
+          <tr>
+            <td>${formatDate(req.dateNeeded)}<br><strong>${req.timeNeeded} - ${end}</strong></td>
+            <td>${veh ? veh.name : '-'}</td>
+            <td>${veh ? veh.plateNo : '-'}</td>
+            <td>${s.driver}</td>
+            <td>${req.office}</td>
+            <td>${req.destination}</td>
+            <td>${req.purpose}</td>
+            <td>${priorityLabel(req.priority)}</td>
+            <td>${statusLabel(s.status)}</td>
+            <td>
+              <div class="inline-actions">
+                <button class="btn btn-secondary" onclick="setScheduleStatus('${s.id}', 'Approved')">Approved</button>
+                <button class="btn btn-success" onclick="setScheduleStatus('${s.id}', 'Ongoing')">Ongoing</button>
+                <button class="btn btn-secondary" onclick="setScheduleStatus('${s.id}', 'Completed')">Completed</button>
+                <button class="btn btn-danger" onclick="deleteSchedule('${s.id}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderDispatchLogs() {
+      const container = document.getElementById('dispatchList');
+      if (!state.dispatchLogs.length) {
+        container.innerHTML = '<div class="empty-state">No dispatch log entries yet.</div>';
+        return;
+      }
+
+      container.innerHTML = state.dispatchLogs.map(log => {
+        const schedule = state.schedules.find(s => s.id === log.scheduleId);
+        const req = schedule ? getRequestById(schedule.requestId) : null;
+        const veh = schedule ? getVehicleById(schedule.vehicleId) : null;
+        const distance = log.odometerEnd - log.odometerStart;
+        return `
+          <div class="mini-item">
+            <strong>${req ? req.office : '-'} - ${req ? req.destination : '-'}</strong>
+            <div class="muted">${veh ? veh.name + ' / ' + veh.plateNo : '-'} • Driver: ${schedule ? schedule.driver : '-'}</div>
+            <div class="muted">Time Out/In: ${log.timeOut} - ${log.timeIn}</div>
+            <div class="muted">Odometer: ${log.odometerStart} to ${log.odometerEnd} (${distance} km est.)</div>
+            <div class="muted">Fuel Issued: ${log.fuelIssued} L</div>
+            <div class="muted">Route: ${log.routeTaken}</div>
+            <div class="muted">Remarks: ${log.remarks || '-'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderVehiclesAndDrivers() {
+      document.getElementById('vehicleList').innerHTML = state.vehicles.length
+        ? '<div class="mini-list">' + state.vehicles.map(v => `
+            <div class="mini-item">
+              <strong>${v.name}</strong>
+              <span class="muted">${v.plateNo} • ${v.type}</span>
+              <div class="inline-actions" style="margin-top: 10px;">
+                <button class="btn btn-danger" onclick="deleteVehicle('${v.id}')">Delete Vehicle</button>
+              </div>
+            </div>`).join('') + '</div>'
+        : '<div class="empty-state">No vehicles yet.</div>';
+
+      document.getElementById('driverList').innerHTML = state.drivers.length
+        ? '<div class="mini-list">' + state.drivers.map(d => `
+            <div class="mini-item">
+              <strong>${d}</strong>
+              <div class="inline-actions" style="margin-top: 10px;">
+                <button class="btn btn-danger" onclick="deleteDriver('${d}')">Delete Driver</button>
+              </div>
+            </div>`).join('') + '</div>'
+        : '<div class="empty-state">No drivers yet.</div>';
+    }
+
+    function renderStats() {
+      document.getElementById('statPending').textContent = state.requests.filter(r => r.status === 'Pending').length;
+      document.getElementById('statApproved').textContent = state.schedules.filter(s => s.status === 'Approved').length;
+      document.getElementById('statOngoing').textContent = state.schedules.filter(s => s.status === 'Ongoing').length;
+      document.getElementById('statCompleted').textContent = state.schedules.filter(s => s.status === 'Completed').length;
+    }
+
+    function renderReports() {
+      const totalTrips = state.schedules.length;
+      const fuel = state.dispatchLogs.reduce((sum, log) => sum + Number(log.fuelIssued || 0), 0);
+      const usageMap = {};
+      state.schedules.forEach(s => {
+        usageMap[s.vehicleId] = (usageMap[s.vehicleId] || 0) + 1;
+      });
+
+      let mostUsedVehicle = '-';
+      let highest = 0;
+      Object.entries(usageMap).forEach(([vehicleId, count]) => {
+        if (count > highest) {
+          highest = count;
+          const v = getVehicleById(vehicleId);
+          mostUsedVehicle = v ? `${v.name} (${v.plateNo})` : '-';
+        }
+      });
+
+      const idleVehicles = state.vehicles.filter(v => !usageMap[v.id]).map(v => `${v.name} (${v.plateNo})`);
+
+      document.getElementById('reportTrips').textContent = totalTrips;
+      document.getElementById('reportFuel').textContent = fuel.toFixed(1);
+      document.getElementById('reportMostUsed').textContent = mostUsedVehicle;
+      document.getElementById('reportIdle').textContent = idleVehicles.length ? idleVehicles.join(', ') : 'None';
+
+      const priorityCounts = {
+        HIGH: 0,
+        MEDIUM: 0,
+        LOW: 0
+      };
+      state.requests.forEach(r => priorityCounts[r.priority]++);
+
+      document.getElementById('prioritySummary').innerHTML = [
+        `<div class="mini-item"><strong>🔴 Emergency</strong><span class="muted">${priorityCounts.HIGH} request(s)</span></div>`,
+        `<div class="mini-item"><strong>🟡 Essential</strong><span class="muted">${priorityCounts.MEDIUM} request(s)</span></div>`,
+        `<div class="mini-item"><strong>⚪ Routine</strong><span class="muted">${priorityCounts.LOW} request(s)</span></div>`
+      ].join('');
+
+      const vehicleSummaryEl = document.getElementById('vehicleSummary');
+      if (!state.vehicles.length) {
+        vehicleSummaryEl.innerHTML = '<div class="empty-state">No vehicles available.</div>';
+      } else {
+        vehicleSummaryEl.innerHTML = state.vehicles.map(v => {
+          const count = usageMap[v.id] || 0;
+          return `<div class="mini-item"><strong>${v.name} (${v.plateNo})</strong><span class="muted">${count} trip(s)</span></div>`;
+        }).join('');
+      }
+    }
+
+    function renderAll() {
+      renderRequests();
+      renderScheduleOptions();
+      renderScheduleTable();
+      renderDispatchLogs();
+      renderVehiclesAndDrivers();
+      renderStats();
+      renderReports();
+      saveState();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabId));
+      document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.toggle('active', tab.id === tabId));
+    }
+
+    function resetAllData() {
+      if (!confirm('Clear all saved requests, schedules, logs, vehicles, and drivers?')) return;
+      state.requests = [];
+      state.schedules = [];
+      state.dispatchLogs = [];
+      state.vehicles = [];
+      state.drivers = [];
+      localStorage.removeItem(STORAGE_KEY);
+      seedDefaults();
+      renderAll();
+      showAlert('requestAlert', 'All data has been cleared.', 'success');
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    document.getElementById('requestForm').addEventListener('submit', addRequest);
+    document.getElementById('scheduleForm').addEventListener('submit', addSchedule);
+    document.getElementById('dispatchForm').addEventListener('submit', addDispatchLog);
+    document.getElementById('vehicleForm').addEventListener('submit', addVehicle);
+    document.getElementById('driverForm').addEventListener('submit', addDriver);
+    document.getElementById('seedBtn').addEventListener('click', seedSampleData);
+    document.getElementById('resetBtn').addEventListener('click', resetAllData);
+    document.getElementById('requestFormReset').addEventListener('click', () => document.getElementById('requestForm').reset());
+    document.getElementById('printReportBtn').addEventListener('click', () => window.print());
+
+    seedDefaults();
+    loadState();
+    seedDefaults();
+    renderAll();
+  </script>
+</body>
+</html>
